@@ -22,5 +22,8 @@
 /suumo_scraper.py
 /tests
 /venv
-/__pycache__
+/streamlit/venv
+/streamlit/.streamlit
+.env
+__pycache__/
 /第3回課題その2.docx
