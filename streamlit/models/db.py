@@ -20,6 +20,7 @@ class User(Base):
     enrollments = relationship("Enrollment", back_populates="student")
     taught_offerings = relationship("OfferingTeacher", back_populates="teacher")
     attendances = relationship("Attendance", back_populates="student")
+    custom_events = relationship("CustomEvent", back_populates="user")
 
 class Course(Base):
     __tablename__ = 'course'
@@ -90,6 +91,19 @@ class Enrollment(Base):
     # Relationships
     student = relationship("User", back_populates="enrollments")
     offering = relationship("CourseOffering", back_populates="enrollments")
+
+class CustomEvent(Base):
+    __tablename__ = 'custom_event'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(String, ForeignKey('user.id'), nullable=False)
+    title = Column(String, nullable=False)
+    start_time = Column(DateTime, nullable=False)
+    end_time = Column(DateTime, nullable=False)
+    color = Column(String, nullable=True, default="#4285F4")
+    
+    # Relationships
+    user = relationship("User", back_populates="custom_events")
 
 def init_db(admin_email="admin@example.com"):
     """Create tables and initialize default admin"""
