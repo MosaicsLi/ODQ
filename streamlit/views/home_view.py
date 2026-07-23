@@ -172,7 +172,7 @@ def render():
     st.divider()
 
     # For testing purposes: Allow student to promote themselves to admin
-    if user_info.get("role") == "student":
+    if user_info.get("role") == "student" or user_info.get("role") == "teacher":
         st.warning("測試功能：您可以將自己的帳號升級為管理員 (Admin) 以測試管理員介面。")
         if st.button("成為管理員 (Test Mode)"):
             session = SessionLocal()
@@ -184,7 +184,23 @@ def render():
                 st.success("成功升級為管理員！請重新整理網頁。")
                 st.rerun()
             session.close()
-
-    auth_controller = AuthController()
-    if st.button("Logout"):
-        auth_controller.logout()
+    elif user_info.get("role") == "admin":
+        st.info("測試功能：您目前是管理員，可以切換回普通學生/教師身份。")
+        
+        # 透過學號/編號的特徵來判斷原本的身分
+        # 老師的編號開頭是 'T' (例如 T0001)，學生的編號是純數字
+        user_id_str = str(user_info.get("id", ""))
+        target_role = "teacher" if user_id_str.startswith("T") else "student"
+    
+        if st.button(f"切換回普通使用者 ({target_role})", use_container_width=True):
+            session = SessionLocal()
+            db_user = session.query(User).filter_by(id=user_info.get("id")).first()
+            if db_user:
+                db_user.role = target_role
+                session.commit()
+            
+            # 同步更新 session_state 並重新渲染
+                st.session_state["user"]["role"] = target_role
+                st.success(f"已切換回 {target_role} 身份！")
+                st.rerun()
+            session.close()

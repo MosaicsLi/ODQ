@@ -12,4 +12,9 @@ def render():
 
     # Display the login button
     login_url = auth_controller.get_login_url()
-    st.markdown(f'<a href="{login_url}" target="_self"><button style="background-color: #4285F4; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Login with Google</button></a>', unsafe_allow_html=True)
+    st.link_button(
+        label="🔑 Login with Google",
+        url=login_url,
+        type="primary",
+        use_container_width=True,
+    )
