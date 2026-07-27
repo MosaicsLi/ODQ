@@ -14,7 +14,18 @@ if "logged_in" not in st.session_state:
 login_page = st.Page(login_view.render, title="Login", icon="🔒", url_path="login")
 home_page = st.Page(home_view.render, title="Home", icon="🏠", url_path="home")
 admin_page = st.Page(admin_view.render, title="Admin Panel", icon="⚙️", url_path="admin")
-
+with st.sidebar:
+    if st.session_state["logged_in"]:
+        user_info = st.session_state.get("user", {})
+        username = user_info.get("name", "使用者")
+        
+        st.write(f"👋 **{username}**，您好！")
+        
+        # 已登入者可以在側邊欄點登出
+        if st.button("🚪 登出", key="logout_btn", use_container_width=True):
+            st.session_state["logged_in"] = False
+            st.session_state.pop("user", None)
+            st.rerun()
 if st.session_state["logged_in"]:
     # If logged in, show home page
     pages = [home_page]
