@@ -132,7 +132,7 @@ def render():
             except Exception as e:
                 st.error(f"儲存失敗，錯誤訊息：{str(e)}")
     
-    # Format events for streamlit-calendar
+    # Format custom events for streamlit-calendar
     calendar_events = []
     for ev in db_events:
         calendar_events.append({
@@ -142,6 +142,24 @@ def render():
             "backgroundColor": ev.color,
             "borderColor": ev.color,
         })
+        
+    # Fetch enrolled courses and add to calendar
+    from models.db import Enrollment, ClassSession
+    enrolled = session.query(Enrollment).filter_by(student_id=user_id).all()
+    for enr in enrolled:
+        offering = enr.offering
+        course_name = offering.course.name
+        # Find all sessions for this offering
+        sessions = session.query(ClassSession).filter_by(offering_id=offering.id).all()
+        for s in sessions:
+            desc = f" [{s.description}]" if s.description else ""
+            calendar_events.append({
+                "title": f"📚 {course_name}{desc}",
+                "start": s.start_time.isoformat(),
+                "end": s.end_time.isoformat(),
+                "backgroundColor": "#34A853", # Green color for enrolled courses
+                "borderColor": "#34A853",
+            })
         
     session.close()
 
