@@ -4,16 +4,25 @@ from dotenv import load_dotenv
 # Load environment variables from .env
 load_dotenv()
 
-from views import login_view, home_view, admin_view
+import views.login_view as login_view
+import views.home_view as home_view
+import views.admin_view as admin_view
+import views.course_admin_view as course_admin_view
+from models.db import init_db
+
+# Initialize database
+init_db()
 
 # Initialize session state for login
 if "logged_in" not in st.session_state:
     st.session_state["logged_in"] = False
 
-# Define pages using Streamlit 1.36+ st.Page
+# --- Page Setup ---
 login_page = st.Page(login_view.render, title="Login", icon="🔒", url_path="login")
 home_page = st.Page(home_view.render, title="Home", icon="🏠", url_path="home")
 admin_page = st.Page(admin_view.render, title="Admin Panel", icon="⚙️", url_path="admin")
+course_admin_page = st.Page(course_admin_view.render, title="Course Admin", icon="📚", url_path="course_admin")
+
 with st.sidebar:
     if st.session_state["logged_in"]:
         user_info = st.session_state.get("user", {})
@@ -26,13 +35,15 @@ with st.sidebar:
             st.session_state["logged_in"] = False
             st.session_state.pop("user", None)
             st.rerun()
+
 if st.session_state["logged_in"]:
     # If logged in, show home page
     pages = [home_page]
     
-    # If admin, append admin page
+    # If admin, append admin pages
     if st.session_state.get("user", {}).get("role") == "admin":
         pages.append(admin_page)
+        pages.append(course_admin_page)
         
     pg = st.navigation(pages)
 else:
